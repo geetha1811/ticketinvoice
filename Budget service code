@@ -1,0 +1,116 @@
+package com.example.financialapp.service;
+
+import com.example.financialapp.dto.BudgetDTO;
+import com.example.financialapp.model.Budget;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface BudgetService {
+
+    Budget createBudget(Budget budget);
+
+    List<Budget> getAllBudgets();
+
+    Optional<Budget> getBudgetById(Long id);
+
+    BudgetDTO updateBudget(Long id, Budget budgetDetails);
+
+    void deleteBudget(Long id);
+}
+
+BudgetServiceImpl.java
+
+package com.example.financialapp.service.impl;
+
+import com.example.financialapp.dto.BudgetDTO;
+import com.example.financialapp.model.Budget;
+import com.example.financialapp.model.Expense;
+import com.example.financialapp.repository.BudgetRepository;
+import com.example.financialapp.repository.ExpenseRepository;
+import com.example.financialapp.service.BudgetService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class BudgetServiceImpl implements BudgetService {
+
+    @Autowired
+    private BudgetRepository budgetRepository;
+
+    @Autowired
+    private ExpenseRepository expenseRepository;
+
+    @Override
+    public Budget createBudget(Budget budget) {
+        return budgetRepository.save(budget);
+    }
+
+    @Override
+    public List<Budget> getAllBudgets() {
+        return budgetRepository.findAll();
+    }
+
+    @Override
+    public Optional<Budget> getBudgetById(Long id) {
+        return budgetRepository.findById(id);
+    }
+
+    @Override
+    public BudgetDTO updateBudget(Long id, Budget budgetDetails) {
+        Optional<Budget> budgetOptional = budgetRepository.findById(id);
+
+        if (!budgetOptional.isPresent()) {
+            throw new RuntimeException("Budget not found for id: " + id);
+        }
+
+        Budget existingBudget = budgetOptional.get();
+        existingBudget.setBudgetLimit(budgetDetails.getBudgetLimit());
+        existingBudget.setStartDate(budgetDetails.getStartDate());
+        existingBudget.setEndDate(budgetDetails.getEndDate());
+
+        // Fetch all expenses within the budget period
+        List<Expense> expensesInPeriod = expenseRepository.findAll().stream()
+                .filter(expense -> expense.getCreatedDate().isAfter(existingBudget.getStartDate()) &&
+                        expense.getCreatedDate().isBefore(existingBudget.getEndDate()))
+                .collect(Collectors.toList());
+
+        // Calculate the total expenses for the given period
+        double totalExpenses = expensesInPeriod.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        existingBudget.setAmount(totalExpenses);
+
+        // Check if the user is over the budget or saved money
+        String statusMessage;
+        if (totalExpenses > existingBudget.getBudgetLimit()) {
+            statusMessage = "Warning: Budget exceeded!";
+        } else {
+            double savings = existingBudget.getBudgetLimit() - totalExpenses;
+            statusMessage = "Good job! You saved " + savings;
+        }
+
+        // Save the updated budget
+        budgetRepository.save(existingBudget);
+
+        // Return the DTO with the status message
+        return new BudgetDTO(
+                existingBudget.getId(),
+                totalExpenses,
+                existingBudget.getBudgetLimit(),
+                existingBudget.getStartDate(),
+                existingBudget.getEndDate(),
+                statusMessage
+        );
+    }
+
+    @Override
+    public void deleteBudget(Long id) {
+        budgetRepository.deleteById(id);
+    }
+}
