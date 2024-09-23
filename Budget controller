@@ -1,0 +1,35 @@
+package com.example.budgettracker.controller;
+
+import com.example.budgettracker.dto.BudgetDTO;
+import com.example.budgettracker.service.BudgetService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/budgets")
+public class BudgetController {
+
+    @Autowired
+    private BudgetService budgetService;
+
+    // Create a new budget
+    @PostMapping
+    public ResponseEntity<BudgetDTO> createBudget(@RequestBody BudgetDTO budgetDTO) {
+        BudgetDTO createdBudget = budgetService.createBudget(budgetDTO);
+        return ResponseEntity.ok(createdBudget);
+    }
+
+    // Add an expense and check the status (whether budget exceeds or is saved)
+    @PostMapping("/{id}/add-expense")
+    public ResponseEntity<String> addExpenseAndCheckStatus(@PathVariable Long id, @RequestParam double expenseAmount) {
+        String statusMessage = budgetService.addExpenseAndCheckStatus(id, expenseAmount);
+        return ResponseEntity.ok(statusMessage);
+    }
+
+    // Fetch all budgets
+    @GetMapping
+    public ResponseEntity<List<BudgetDTO>> getAllBudgets() {
+        return ResponseEntity.ok(budgetService.getAllBudgets());
+    }
+}
