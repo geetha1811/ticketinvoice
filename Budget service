@@ -1,0 +1,51 @@
+package com.example.budgettracker.service;
+
+import com.example.budgettracker.dto.BudgetDTO;
+import com.example.budgettracker.entity.Budget;
+import com.example.budgettracker.repository.BudgetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class BudgetService {
+
+    @Autowired
+    private BudgetRepository budgetRepository;
+
+    // Create a new budget
+    public BudgetDTO createBudget(BudgetDTO budgetDTO) {
+        Budget budget = new Budget(budgetDTO.getAmount(), budgetDTO.getStartDate(), budgetDTO.getEndDate());
+        Budget savedBudget = budgetRepository.save(budget);
+        return mapToDTO(savedBudget);
+    }
+
+    // Add an expense and check if budget exceeds or is saved
+    public String addExpenseAndCheckStatus(Long id, double newExpense) {
+        Budget budget = budgetRepository.findById(id).orElseThrow(() -> new RuntimeException("Budget not found"));
+        budget.setTotalExpenses(budget.getTotalExpenses() + newExpense);
+        budgetRepository.save(budget);
+
+        if (budget.getTotalExpenses() > budget.getAmount()) {
+            return "Warning: You have exceeded your budget by " + (budget.getTotalExpenses() - budget.getAmount()) + " units.";
+        } else if (budget.getTotalExpenses() == budget.getAmount()) {
+            return "You've exactly met your budget!";
+        } else {
+            return "Good job! You are under budget by " + (budget.getAmount() - budget.getTotalExpenses()) + " units.";
+        }
+    }
+
+    // Fetch all budgets
+    public List<BudgetDTO> getAllBudgets() {
+        List<Budget> budgets = budgetRepository.findAll();
+        return budgets.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    // Helper method to map entity to DTO
+    private BudgetDTO mapToDTO(Budget budget) {
+        return new BudgetDTO(budget.getId(), budget.getAmount(), budget.getTotalExpenses(), budget.getStartDate(), budget.getEndDate());
+    }
+}
