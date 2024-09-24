@@ -1,0 +1,31 @@
+import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
+  username: string = '';
+  password: string = '';
+  errorMessage: string = '';
+
+  constructor(private authService: AuthService, private router: Router) { }
+
+  login() {
+    const credentials = { username: this.username, password: this.password };
+
+    this.authService.login(credentials).subscribe(
+      response => {
+        // Save JWT token in localStorage (assuming the backend returns a JWT)
+        localStorage.setItem('token', response.token);
+        this.router.navigate(['/home']);  // Navigate to home after successful login
+      },
+      error => {
+        this.errorMessage = 'Invalid credentials';
+      }
+    );
+  }
+}
