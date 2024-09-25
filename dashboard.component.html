@@ -1,0 +1,23 @@
+<!-- src/app/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <!-- Left Sidebar -->
+  <div class="sidebar left-sidebar">
+    <ul>
+      <li><a routerLink="/dashboard">Dashboard</a></li>
+      <li><a routerLink="/page1">Page 1</a></li>
+      <li><a routerLink="/page2">Page 2</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Right Sidebar -->
+  <div class="sidebar right-sidebar">
+    <ul>
+      <li>Right Sidebar Content</li>
+    </ul>
+  </div>
+</div>
