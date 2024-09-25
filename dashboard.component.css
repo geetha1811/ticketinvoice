@@ -1,0 +1,42 @@
+/* src/app/dashboard/dashboard.component.css */
+.dashboard-container {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  padding: 15px;
+  background-color: #f4f4f4;
+  border-right: 1px solid #ddd;
+}
+
+.left-sidebar {
+  order: 1;
+}
+
+.right-sidebar {
+  order: 3;
+  background-color: #e7e7e7;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+  order: 2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .main-content {
+    width: 100%;
+  }
+}
