@@ -1,0 +1,37 @@
+div>
+
+<div nz-row>
+
+<h3 nz-card-grid nzSpan="8" nz-col [ngStyle]="gridStyle">Balance: <span style="color: slateblue;">${{stats?.balance}}</span>
+
+</h3>
+
+<h3 nz-card-grid nzSpan="8" nz-col [ngStyle]="gridStyle">Total Income: <span style="color:green;">${{stats?.income}}</span>
+
+</h3>
+
+<h3 nz-card-grid nzSpan="8" nz-col [ngStyle]="gridStyle">Total Expense: <span style="color: red;">${{stats?.expense}}</span>
+
+</h3>
+
+</div>
+
+<div nz-row style="margin-top: 20px;">
+
+<div nz-col nzFlex="1 1 200px">
+
+<nz-card nzType="inner" nzTitle="Income Chart"></nz-card>
+
+</div>
+
+<div nz-col nzFlex="0 1 300px" style="margin-left: 15px;">
+
+<z-card nzType="inner" nzTitle="Recent History">
+
+</nz-card>
+
+</div>
+
+</div>
+
+■</div>
