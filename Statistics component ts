@@ -27,6 +27,21 @@ div>
 <div nz-col nzFlex="0 1 300px" style="margin-left: 15px;">
 
 <z-card nzType="inner" nzTitle="Recent History">
+div nz-card-grid style="width: 100%;">
+
+<span style="color:green;">+{{stats?.latestIncome?.amount}} {{stats?.latestIncome?.title}}</span>
+
+</div>
+
+<div nz-card-grid style="width: 100%;">
+
+<span style="color: red;">-{{stats?.latestExpense?.amount}} {{stats?.latestExpense?.title}}</span>
+
+</div>
+
+</nz-card> I
+
+<nz-card nzType="inner" nzTitle="Income">
 
 </nz-card>
 
