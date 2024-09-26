@@ -1,0 +1,15 @@
+constructor(private statsservice: Statsservice){
+
+this.getStats();
+
+}
+
+getStats(){
+
+this.statsService.getStats().subscribe (res=>{
+
+console.log(res);
+
+})
+
+}
