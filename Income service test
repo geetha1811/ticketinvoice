@@ -1,0 +1,78 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+public class IncomeServiceTest {
+
+    private IncomeService incomeService;
+    private IncomeRepository incomeRepository;
+
+    private Income income;
+
+    @BeforeEach
+    void setUp() {
+        incomeRepository = new IncomeRepository(); // Assuming an actual implementation is available
+        incomeService = new IncomeService(incomeRepository);
+
+        // Initialize a sample income
+        income = new Income();
+        income.setId(1L);
+        income.setAmount(5000.0);
+        income.setDate(LocalDate.now());
+        income.setDescription("Salary");
+    }
+
+    @Test
+    void testSaveIncome() {
+        // Saving the income
+        Income savedIncome = incomeService.saveIncome(income);
+
+        // Assert the values
+        assertNotNull(savedIncome);
+        assertEquals(income.getId(), savedIncome.getId());
+        assertEquals(income.getAmount(), savedIncome.getAmount());
+        assertEquals(income.getDescription(), savedIncome.getDescription());
+    }
+
+    @Test
+    void testGetIncomeById() {
+        // Save the income first
+        incomeService.saveIncome(income);
+
+        // Retrieve it by ID
+        Income foundIncome = incomeService.getIncomeById(1L);
+
+        // Assert that the income exists and matches
+        assertNotNull(foundIncome);
+        assertEquals(income.getDescription(), foundIncome.getDescription());
+    }
+
+    @Test
+    void testGetAllIncomes() {
+        // Save the income
+        incomeService.saveIncome(income);
+
+        // Retrieve all incomes
+        List<Income> allIncomes = incomeService.getAllIncomes();
+
+        // Assert the size and values
+        assertFalse(allIncomes.isEmpty());
+        assertEquals(1, allIncomes.size());
+    }
+
+    @Test
+    void testDeleteIncome() {
+        // Save the income
+        incomeService.saveIncome(income);
+
+        // Delete the income
+        incomeService.deleteIncome(1L);
+
+        // Ensure it's deleted
+        Optional<Income> deletedIncome = incomeService.findIncomeById(1L);
+        assertTrue(deletedIncome.isEmpty());
+    }
+}
