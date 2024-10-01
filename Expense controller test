@@ -1,0 +1,139 @@
+package yg.bootcamp.demo.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import yg.bootcamp.demo.dto.ExpenseDTO;
+import yg.bootcamp.demo.entity.Expense;
+import yg.bootcamp.demo.service.ExpenseService;
+
+import java.util.Collections;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(ExpenseController.class)
+class ExpenseControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Mock
+    private ExpenseService expenseService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    void getExpensesTest() throws Exception {
+        when(expenseService.getExpenses()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/expenses"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
+
+        verify(expenseService, times(1)).getExpenses();
+    }
+
+    @Test
+    void getExpensesByUserIdTest() throws Exception {
+        int userId = 1;
+        when(expenseService.getExpensesByUserId(userId)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/expenses/user/{userId}", userId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
+
+        verify(expenseService, times(1)).getExpensesByUserId(userId);
+    }
+
+    @Test
+    void postOrCreateExpenseTest() throws Exception {
+        int userId = 1;
+        ExpenseDTO expenseDTO = new ExpenseDTO();
+        expenseDTO.setDescription("Test Expense");
+        expenseDTO.setAmount(100.0);
+
+        Expense createdExpense = new Expense();
+        createdExpense.setId(1);
+        createdExpense.setDescription("Test Expense");
+        createdExpense.setAmount(100.0);
+
+        when(expenseService.postOrCreateExpense(expenseDTO, userId)).thenReturn(createdExpense);
+
+        mockMvc.perform(post("/createexpense/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(expenseDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Test Expense"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.amount").value(100.0));
+
+        verify(expenseService, times(1)).postOrCreateExpense(expenseDTO, userId);
+    }
+
+    @Test
+    void getExpenseByIdTest() throws Exception {
+        int id = 1;
+        Expense expense = new Expense();
+        expense.setId(id);
+        expense.setDescription("Test Expense");
+
+        when(expenseService.getExpenseById(id)).thenReturn(expense);
+
+        mockMvc.perform(get("/expense/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Test Expense"));
+
+        verify(expenseService, times(1)).getExpenseById(id);
+    }
+
+    @Test
+    void updateExpenseTest() throws Exception {
+        int id = 1;
+        ExpenseDTO expenseDTO = new ExpenseDTO();
+        expenseDTO.setDescription("Updated Expense");
+        expenseDTO.setAmount(200.0);
+
+        Expense updatedExpense = new Expense();
+        updatedExpense.setId(id);
+        updatedExpense.setDescription("Updated Expense");
+
+        when(expenseService.updateExpense(id, expenseDTO)).thenReturn(updatedExpense);
+
+        mockMvc.perform(put("/expense/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(expenseDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Updated Expense"));
+
+        verify(expenseService, times(1)).updateExpense(id, expenseDTO);
+    }
+
+    @Test
+    void deleteExpenseTest() throws Exception {
+        int id = 1;
+
+        doNothing().when(expenseService).deleteExpense(id);
+
+        mockMvc.perform(delete("/expense/{id}", id))
+                .andExpect(status().isOk());
+
+        verify(expenseService, times(1)).deleteExpense(id);
+    }
+}
