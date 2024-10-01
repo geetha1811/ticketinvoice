@@ -1,0 +1,158 @@
+package yg.bootcamp.demo.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import yg.bootcamp.demo.entity.Expense;
+import yg.bootcamp.demo.entity.User;
+import yg.bootcamp.demo.dto.ExpenseDTO;
+import yg.bootcamp.demo.repository.ExpenseRepository;
+import yg.bootcamp.demo.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
+class ExpenseServiceTest {
+
+    @InjectMocks
+    private ExpenseService expenseService;
+
+    @Mock
+    private ExpenseRepository expenseRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this); // Initialize mocks
+    }
+
+    @Test
+    void testGetExpenses() {
+        Iterable<Expense> expenses = Arrays.asList(new Expense(), new Expense());
+        when(expenseRepository.findAll()).thenReturn(expenses);
+
+        Iterable<Expense> result = expenseService.getExpenses();
+        assertNotNull(result);
+        verify(expenseRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testGetAllExpenses() {
+        List<Expense> expenses = Arrays.asList(new Expense(), new Expense());
+        when(expenseRepository.findAll()).thenReturn(expenses);
+
+        List<Expense> result = expenseService.getAllExpenses();
+        assertEquals(2, result.size());
+        verify(expenseRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testGetExpensesByUserId() {
+        int userId = 1;
+        List<Expense> expenses = Arrays.asList(new Expense(), new Expense());
+        when(expenseRepository.findByUserId(userId)).thenReturn(expenses);
+
+        List<Expense> result = expenseService.getExpensesByUserId(userId);
+        assertEquals(2, result.size());
+        verify(expenseRepository, times(1)).findByUserId(userId);
+    }
+
+    @Test
+    void testPostOrCreateExpense_UserFound() {
+        int userId = 1;
+        ExpenseDTO expenseDTO = new ExpenseDTO();
+        Optional<User> userOptional = Optional.of(new User());
+        when(userRepository.findById(userId)).thenReturn(userOptional);
+
+        Expense result = expenseService.postOrCreateExpense(expenseDTO, userId);
+
+        assertNotNull(result);
+        verify(userRepository, times(1)).findById(userId);
+        verify(expenseRepository, times(1)).save(any(Expense.class));
+    }
+
+    @Test
+    void testPostOrCreateExpense_UserNotFound() {
+        int userId = 1;
+        ExpenseDTO expenseDTO = new ExpenseDTO();
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            expenseService.postOrCreateExpense(expenseDTO, userId);
+        });
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(expenseRepository, never()).save(any(Expense.class));
+    }
+
+    @Test
+    void testSaveOrUpdateExpense() {
+        User user = new User();
+        Expense expense = new Expense();
+        ExpenseDTO expenseDTO = new ExpenseDTO();
+
+        Expense result = expenseService.saveOrUpdateExpense(expense, expenseDTO, user);
+
+        assertNotNull(result);
+        verify(expenseRepository, times(1)).save(expense);
+    }
+
+    @Test
+    void testGetExpenseById_ExpenseFound() {
+        int expenseId = 1;
+        Expense expense = new Expense();
+        Optional<Expense> optionalExpense = Optional.of(expense);
+        when(expenseRepository.findById(expenseId)).thenReturn(optionalExpense);
+
+        Expense result = expenseService.getExpenseById(expenseId);
+
+        assertNotNull(result);
+        verify(expenseRepository, times(1)).findById(expenseId);
+    }
+
+    @Test
+    void testGetExpenseById_ExpenseNotFound() {
+        int expenseId = 1;
+        when(expenseRepository.findById(expenseId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            expenseService.getExpenseById(expenseId);
+        });
+
+        verify(expenseRepository, times(1)).findById(expenseId);
+    }
+
+    @Test
+    void testDeleteExpense_ExpenseFound() {
+        int expenseId = 1;
+        Expense expense = new Expense();
+        Optional<Expense> optionalExpense = Optional.of(expense);
+        when(expenseRepository.findById(expenseId)).thenReturn(optionalExpense);
+
+        expenseService.deleteExpense(expenseId);
+
+        verify(expenseRepository, times(1)).deleteById(expenseId);
+    }
+
+    @Test
+    void testDeleteExpense_ExpenseNotFound() {
+        int expenseId = 1;
+        when(expenseRepository.findById(expenseId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            expenseService.deleteExpense(expenseId);
+        });
+
+        verify(expenseRepository, times(1)).findById(expenseId);
+        verify(expenseRepository, never()).deleteById(expenseId);
+    }
+}
