@@ -1,4 +1,4 @@
-package yg.bootcamp.demo.service;
+hupackage yg.bootcamp.demo.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -155,4 +155,36 @@ class ExpenseServiceTest {
         verify(expenseRepository, times(1)).findById(expenseId);
         verify(expenseRepository, never()).deleteById(expenseId);
     }
+}
+
+
+
+
+
+
+
+
+
+@Test
+void testGetAllExpenses() {
+    // Create mock expenses
+    Expense expense1 = new Expense();
+    expense1.setCreatedDate(new Date()); // Set a current date for sorting
+    
+    Expense expense2 = new Expense();
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DATE, -1); // Set a past date for sorting
+    expense2.setCreatedDate(cal.getTime());
+
+    // Simulate a list of expenses in the repository
+    List<Expense> expenses = Arrays.asList(expense1, expense2);
+    when(expenseRepository.findAll()).thenReturn(expenses);
+
+    // Call the service method
+    List<Expense> result = expenseService.getAllExpenses();
+
+    // Verify that the list is sorted by createdDate in descending order
+    assertEquals(2, result.size());
+    assertTrue(result.get(0).getCreatedDate().after(result.get(1).getCreatedDate()));
+    verify(expenseRepository, times(1)).findAll();
 }
