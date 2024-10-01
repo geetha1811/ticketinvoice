@@ -1,4 +1,4 @@
-hupackage yg.bootcamp.demo.service;
+iihupackage yg.bootcamp.demo.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -187,4 +187,49 @@ void testGetAllExpenses() {
     assertEquals(2, result.size());
     assertTrue(result.get(0).getCreatedDate().after(result.get(1).getCreatedDate()));
     verify(expenseRepository, times(1)).findAll();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@Test
+void testSaveOrUpdateExpense() {
+    // Create mock user
+    User user = new User();
+    user.setId(1);
+    
+    // Create mock expense
+    Expense expense = new Expense();
+    
+    // Create mock ExpenseDTO
+    ExpenseDTO expenseDTO = new ExpenseDTO();
+    expenseDTO.setExpenseName("Test Expense");
+    expenseDTO.setCreatedDate(new Date());
+    expenseDTO.setAmount(100.0);
+    expenseDTO.setCategory("Test Category");
+    expenseDTO.setDescription("Test Description");
+    
+    // Call the method to test
+    when(expenseRepository.save(any(Expense.class))).thenReturn(expense);
+    Expense result = expenseService.saveOrUpdateExpense(expense, expenseDTO, user);
+
+    // Verify that the expense was saved with the correct values
+    assertNotNull(result);
+    assertEquals(expense.getExpenseName(), expenseDTO.getExpenseName());
+    assertEquals(expense.getCreatedDate(), expenseDTO.getCreatedDate());
+    assertEquals(expense.getAmount(), expenseDTO.getAmount());
+    assertEquals(expense.getCategory(), expenseDTO.getCategory());
+    assertEquals(expense.getDescription(), expenseDTO.getDescription());
+    assertEquals(expense.getUser(), user);
+    
+    // Verify that the save method in the repository was called
+    verify(expenseRepository, times(1)).save(expense);
 }
