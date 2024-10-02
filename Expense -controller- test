@@ -1,0 +1,214 @@
+package yg.bootcamp.demo.controller;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import yg.bootcamp.demo.dto.ExpenseDTO;
+import yg.bootcamp.demo.entity.Expense;
+import yg.bootcamp.demo.service.ExpenseService;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import java.util.Arrays;
+import java.util.List;
+
+class ExpenseControllerTest {
+
+    @Mock
+    private ExpenseService expenseService;
+
+    @InjectMocks
+    private ExpenseController expenseController;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this); // Initialize Mocks
+    }
+
+    @Test
+    void testGetExpenses() {
+        // Mock the service response
+        List<Expense> mockExpenses = Arrays.asList(new Expense(), new Expense());
+        when(expenseService.getExpenses()).thenReturn(mockExpenses);
+
+        // Call the controller method
+        Iterable<Expense> expenses = expenseController.getExpenses();
+
+        // Assertions
+        assertNotNull(expenses);
+        verify(expenseService, times(1)).getExpenses(); // Verify if the service method was called
+    }
+
+    @Test
+    void testGetExpensesByUserId_Success() {
+        int userId = 1;
+        // Mocking the service response
+        List<Expense> mockExpenses = Arrays.asList(new Expense(), new Expense());
+        when(expenseService.getExpensesByUserId(userId)).thenReturn(mockExpenses);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.getExpensesByUserId(userId);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockExpenses, response.getBody());
+        verify(expenseService, times(1)).getExpensesByUserId(userId); // Verify service call
+    }
+
+    @Test
+    void testGetExpensesByUserId_NotFound() {
+        int userId = 1;
+
+        // Mock the service to throw EntityNotFoundException
+        when(expenseService.getExpensesByUserId(userId)).thenThrow(new EntityNotFoundException("User not found"));
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.getExpensesByUserId(userId);
+
+        // Assertions
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("User not found", response.getBody());
+        verify(expenseService, times(1)).getExpensesByUserId(userId); // Verify service call
+    }
+
+    @Test
+    void testPostOrCreateExpense_Success() {
+        int userId = 1;
+        ExpenseDTO dto = new ExpenseDTO();
+        Expense mockExpense = new Expense();
+
+        // Mocking the service call
+        when(expenseService.postOrCreateExpense(dto, userId)).thenReturn(mockExpense);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.postorCreateExpense(dto, userId);
+
+        // Assertions
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(mockExpense, response.getBody());
+        verify(expenseService, times(1)).postOrCreateExpense(dto, userId); // Verify service call
+    }
+
+    @Test
+    void testPostOrCreateExpense_Failure() {
+        int userId = 1;
+        ExpenseDTO dto = new ExpenseDTO();
+
+        // Mock the service to return null, indicating failure
+        when(expenseService.postOrCreateExpense(dto, userId)).thenReturn(null);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.postorCreateExpense(dto, userId);
+
+        // Assertions
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(expenseService, times(1)).postOrCreateExpense(dto, userId); // Verify service call
+    }
+
+    @Test
+    void testGetExpenseById_Success() {
+        int expenseId = 1;
+        Expense mockExpense = new Expense();
+
+        // Mocking the service response
+        when(expenseService.getExpenseById(expenseId)).thenReturn(mockExpense);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.getExpenseById(expenseId);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockExpense, response.getBody());
+        verify(expenseService, times(1)).getExpenseById(expenseId); // Verify service call
+    }
+
+    @Test
+    void testGetExpenseById_NotFound() {
+        int expenseId = 1;
+
+        // Mock the service to throw EntityNotFoundException
+        when(expenseService.getExpenseById(expenseId)).thenThrow(new EntityNotFoundException("Expense not found"));
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.getExpenseById(expenseId);
+
+        // Assertions
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Expense not found", response.getBody());
+        verify(expenseService, times(1)).getExpenseById(expenseId); // Verify service call
+    }
+
+    @Test
+    void testUpdateExpense_Success() {
+        int expenseId = 1;
+        ExpenseDTO dto = new ExpenseDTO();
+        Expense updatedExpense = new Expense();
+
+        // Mocking the service response
+        when(expenseService.updateExpense(expenseId, dto)).thenReturn(updatedExpense);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.updateExpense(expenseId, dto);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedExpense, response.getBody());
+        verify(expenseService, times(1)).updateExpense(expenseId, dto); // Verify service call
+    }
+
+    @Test
+    void testUpdateExpense_NotFound() {
+        int expenseId = 1;
+        ExpenseDTO dto = new ExpenseDTO();
+
+        // Mock the service to throw EntityNotFoundException
+        when(expenseService.updateExpense(expenseId, dto)).thenThrow(new EntityNotFoundException("Expense not found"));
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.updateExpense(expenseId, dto);
+
+        // Assertions
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Expense not found", response.getBody());
+        verify(expenseService, times(1)).updateExpense(expenseId, dto); // Verify service call
+    }
+
+    @Test
+    void testDeleteExpense_Success() {
+        int expenseId = 1;
+
+        // Mock the service to do nothing (successful deletion)
+        doNothing().when(expenseService).deleteExpense(expenseId);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.deleteExpense(expenseId);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(expenseService, times(1)).deleteExpense(expenseId); // Verify service call
+    }
+
+    @Test
+    void testDeleteExpense_NotFound() {
+        int expenseId = 1;
+
+        // Mock the service to throw EntityNotFoundException
+        doThrow(new EntityNotFoundException("Expense not found")).when(expenseService).deleteExpense(expenseId);
+
+        // Call the controller method
+        ResponseEntity<?> response = expenseController.deleteExpense(expenseId);
+
+        // Assertions
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Expense not found", response.getBody());
+        verify(expenseService, times(1)).deleteExpense(expenseId); // Verify service call
+    }
+}
