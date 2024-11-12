@@ -35,3 +35,25 @@ onFirstDataRendered(params: any): void {
     }
   }
 }
+
+
+
+
+
+
+
+onFirstDataRendered(params: any): void {
+  setTimeout(() => {
+    // Get the filter instance for 'status' column
+    const filterInstance = this.gridApi.getFilterInstance('status');
+    
+    if (filterInstance) {
+      // Set the filter to show only 'A' by default
+      filterInstance.setModel({ values: ['A'] });
+      
+      // Apply the filter and refresh the view
+      this.gridApi.onFilterChanged();
+      this.gridApi.refreshCells(); // Ensure cells are refreshed
+    }
+  }, 100); // Adjust the delay if necessary
+}
