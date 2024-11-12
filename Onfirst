@@ -12,3 +12,26 @@ onFirstDataRendered(params: any): void {
     }
   }
 }
+
+
+
+
+
+
+onFirstDataRendered(params: any): void {
+    // Adding a small delay to ensure the data is fully loaded before setting the filter
+    setTimeout(() => {
+      this.setDefaultFilter();
+    }, 100); // 100ms delay to allow data to load completely
+  }
+
+  setDefaultFilter(): void {
+    // Get the filter instance for the 'status' column
+    const filterInstance = this.gridApi.getFilterInstance('status');
+    if (filterInstance) {
+      // Set the filter model to show only 'A' (Active) by default
+      filterInstance.setModel({ values: ['A'] });
+      this.gridApi.onFilterChanged(); // Apply the filter
+    }
+  }
+}
