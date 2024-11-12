@@ -1,0 +1,14 @@
+onFirstDataRendered(params: any): void {
+    this.setDefaultFilter();
+  }
+
+  setDefaultFilter(): void {
+    // Get the filter instance for the 'status' column
+    const filterInstance = this.gridApi.getFilterInstance('status');
+    if (filterInstance) {
+      // Set the filter model to show only 'A' (Active) by default
+      filterInstance.setModel({ values: ['A'] });
+      this.gridApi.onFilterChanged(); // Apply the filter
+    }
+  }
+}
