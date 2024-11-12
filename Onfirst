@@ -57,3 +57,31 @@ onFirstDataRendered(params: any): void {
     }
   }, 100); // Adjust the delay if necessary
 }
+
+
+
+
+
+onGridReady(params: any): void {
+  this.gridApi = params.api;
+  this.gridColumnApi = params.columnApi;
+
+  // Adjust columns to fit
+  this.gridApi.sizeColumnsToFit();
+
+  // Set default filter to "A" on load
+  this.applyDefaultStatusFilter();
+}
+
+applyDefaultStatusFilter(): void {
+  setTimeout(() => {
+    // Get the filter instance for 'status' column
+    const filterInstance = this.gridApi.getFilterInstance('status');
+
+    if (filterInstance) {
+      // Set the filter model to show only 'A'
+      filterInstance.setModel({ values: ['A'] });
+      this.gridApi.onFilterChanged(); // Apply the filter
+    }
+  }, 100); // Delay to ensure data is loaded
+}
