@@ -1,69 +1,60 @@
-Here is the complete setup for the Breakdown component, including all required files and the QuickSearch feature you mentioned. I will create the structure step-by-step and cover all necessary files, modules, and functionalities.
+Here’s the Breakdown Component HTML structured exactly like your provided reference code, maintaining consistency in style, usage of classes, and Angular directives.
 
 
 ---
 
-1. Create the Breakdown Component
-
-Generate the component using Angular CLI:
-
-ng generate component breakdown
-
-
----
-
-2. Breakdown Component Files
-
-breakdown.component.html
-
-This file includes the QuickSearch and other functionalities:
+Breakdown Component HTML
 
 <div>
-  <ng4-loading-spinner [threshold]="1" [timeout]="60000" [zIndex]="100000"></ng4-loading-spinner>
+  <!-- Loading Spinner -->
+  <ng4-loading-spinner [threshold]="1" [timeout]="68000" [zIndex]="100000"></ng4-loading-spinner>
 
+  <!-- Form for Breakdown -->
   <form [formGroup]="breakdownForm">
     <mat-accordion>
-      <mat-expansion-panel class="mat-expansion-panel-one" [expanded]="true">
-        <div class="form-row">
-          <!-- RC/CRC Category Dropdown -->
+      <!-- Expansion Panel for Input Section -->
+      <mat-expansion-panel class="mat-expansion-panel-one" [expanded]="true" style="margin-bottom: 10px;">
+        <div class="form-row" style="padding: 10px;">
+          <!-- Quick Search Dropdown -->
           <div class="col-sm-3">
             <div class="form-group">
-              <span class="span-text">Select RC/CRC Category</span>
+              <span class="span-text">Quick Search</span>
               <div class="input-group">
                 <select
                   class="form-control form-control-alt select-style"
-                  formControlName="rcCrcCategory"
-                  (change)="fetchRcCrcDetails()"
+                  id="quickSearch"
+                  formControlName="quickSearch"
+                  [(ngModel)]="selectedSearch"
+                  (change)="onQuickSearchChange()"
                 >
-                  <option *ngFor="let category of rcCrcCategories" [value]="category.id">
-                    {{ category.name }}
+                  <option *ngFor="let option of searchOptions" [value]="option.value">
+                    {{ option.label }}
                   </option>
                 </select>
               </div>
             </div>
           </div>
 
-          <!-- QuickSearch Input -->
+          <!-- Source Description -->
           <div class="col-sm-3">
             <div class="form-group">
-              <span class="span-text">QuickSearch</span>
+              <span class="span-text">Source Description</span>
               <input
                 type="text"
-                class="form-control form-control-alt"
-                formControlName="quickSearch"
-                (input)="applyQuickSearch()"
-                placeholder="Search by Basic ID"
+                class="form-control form-control-alt text-style"
+                formControlName="sourceDescription"
+                placeholder="Enter source description"
               />
             </div>
           </div>
 
-          <!-- Date Selection -->
+          <!-- Date Picker -->
           <div class="col-sm-3">
             <div class="form-group">
               <span class="span-text">Select Date</span>
               <input
                 type="date"
-                class="form-control form-control-alt"
+                class="form-control form-control-alt text-style"
                 formControlName="selectedDate"
               />
             </div>
@@ -71,85 +62,41 @@ This file includes the QuickSearch and other functionalities:
 
           <!-- Run Button -->
           <div class="col-sm-3">
-            <button
-              type="button"
-              class="btn btn-primary"
-              (click)="fetchBreakdownData()"
-            >
-              Run
-            </button>
+            <div class="form-group">
+              <button
+                type="button"
+                class="btn btn-primary"
+                style="margin-top: 25px; width: 100%;"
+                (click)="runQuery()"
+              >
+                Run
+              </button>
+            </div>
           </div>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
   </form>
 
-  <!-- Query Output -->
-  <div class="query-output">
-    <table class="table table-bordered table-hover">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Basic ID</th>
-          <th>Category</th>
-          <th>Balance ID</th>
-          <th>Account</th>
-          <th>System ENV</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of filteredBreakdownData">
-          <td>{{ data.date }}</td>
-          <td>{{ data.basicId }}</td>
-          <td>{{ data.category }}</td>
-          <td>{{ data.balanceId }}</td>
-          <td>{{ data.account }}</td>
-          <td>{{ data.systemEnv }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Query Output Section -->
+  <div class="query-output" style="margin-top: 20px;">
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="true">
+        <div class="form-row" style="padding: 10px; background-color: #f9f9f9;">
+          <h4>Query Output</h4>
+          <pre class="text-style" style="padding: 10px;">{{ queryOutput | json }}</pre>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>
 
 
 ---
 
-breakdown.component.scss
+2. Breakdown Component TS
 
-Define styles for the component:
-
-.mat-expansion-panel-one {
-  background-color: #f5f5f5;
-  padding: 10px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.select-style {
-  width: 100%;
-  height: 35px;
-  border: 1px solid #ccc;
-}
-
-.query-output {
-  margin-top: 20px;
-  table {
-    width: 100%;
-    th, td {
-      padding: 8px;
-      text-align: left;
-    }
-  }
-}
-
-
----
-
-breakdown.component.ts
-
-Implement the logic for the component, including QuickSearch:
+The component logic ties the form, the dropdown options, and the query output together.
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -157,111 +104,108 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-breakdown',
   templateUrl: './breakdown.component.html',
-  styleUrls: ['./breakdown.component.scss'],
+  styleUrls: ['./breakdown.component.css'],
 })
 export class BreakdownComponent implements OnInit {
   breakdownForm: FormGroup;
-  rcCrcCategories = [
-    { id: 'category1', name: 'Category 1' },
-    { id: 'category2', name: 'Category 2' },
-    { id: 'category3', name: 'Category 3' },
+  searchOptions = [
+    { label: 'Option 1', value: 'option1' },
+    { label: 'Option 2', value: 'option2' },
+    { label: 'Option 3', value: 'option3' },
   ];
-  breakdownData: any[] = [];
-  filteredBreakdownData: any[] = [];
+  selectedSearch: string = '';
+  queryOutput: any = null;
 
   constructor(private fb: FormBuilder) {
+    // Initialize form
     this.breakdownForm = this.fb.group({
-      rcCrcCategory: [''],
-      selectedDate: [''],
       quickSearch: [''],
+      sourceDescription: [''],
+      selectedDate: [''],
     });
   }
 
-  ngOnInit(): void {
-    // Mock data for demonstration
-    this.breakdownData = [
-      {
-        date: '2024-11-27',
-        basicId: 'BCS2750981',
-        category: 'Category 1',
-        balanceId: '12345',
-        account: 'Account 1',
-        systemEnv: 'System A',
-      },
-      {
-        date: '2024-11-28',
-        basicId: 'BCS2750982',
-        category: 'Category 2',
-        balanceId: '12346',
-        account: 'Account 2',
-        systemEnv: 'System B',
-      },
-    ];
-    this.filteredBreakdownData = this.breakdownData;
+  ngOnInit(): void {}
+
+  onQuickSearchChange(): void {
+    console.log('Selected Quick Search:', this.breakdownForm.value.quickSearch);
   }
 
-  fetchRcCrcDetails(): void {
-    const selectedCategory = this.breakdownForm.value.rcCrcCategory;
-    console.log('Selected Category:', selectedCategory);
-    // Fetch the relevant details based on the category
-  }
-
-  fetchBreakdownData(): void {
+  runQuery(): void {
     const formData = this.breakdownForm.value;
-    console.log('Fetching data for:', formData);
-    // Filter or fetch data logic can be added here
-  }
+    console.log('Form Data:', formData);
 
-  applyQuickSearch(): void {
-    const searchTerm = this.breakdownForm.value.quickSearch.toLowerCase();
-    this.filteredBreakdownData = this.breakdownData.filter((data) =>
-      data.basicId.toLowerCase().includes(searchTerm)
-    );
+    // Simulate query output
+    this.queryOutput = {
+      search: formData.quickSearch,
+      description: formData.sourceDescription,
+      date: formData.selectedDate,
+    };
   }
 }
 
 
 ---
 
-3. Update App Module
+3. CSS for Styling
 
-app.module.ts
+Ensure the CSS matches the provided reference, emphasizing consistent styling.
 
-Add the required imports and register the component:
+.form-control-alt {
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #fff;
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+}
 
-import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { BreakdownComponent } from './breakdown/breakdown.component';
+.span-text {
+  font-size: 14px;
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-weight: 400;
+}
 
-@NgModule({
-  declarations: [BreakdownComponent],
-  imports: [
-    ReactiveFormsModule,
-    MatExpansionModule,
-    // Add other required modules here
-  ],
-  bootstrap: [BreakdownComponent],
-})
-export class AppModule {}
-
-
----
-
-4. Add Routing
-
-app-routing.module.ts
-
-Add a route for the Breakdown component:
-
-import { BreakdownComponent } from './breakdown/breakdown.component';
-
-const routes: Routes = [
-  { path: 'breakdown', component: BreakdownComponent },
-];
+.text-style {
+  border: 1px solid #ccc;
+  font-size: 14px;
+  padding: 5px;
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  background-color: #fff;
+}
 
 
 ---
 
-This setup includes the QuickSearch functionality and mock data to demonstrate how the component should behave. Let me know if you need further refinements!
+Explanation
+
+1. Form Controls:
+
+Each input field is bound to a form control using formControlName.
+
+Dropdown options are generated dynamically using *ngFor.
+
+
+
+2. Run Button:
+
+On clicking the "Run" button, the runQuery() method is called to process the form data and display it in the query output.
+
+
+
+3. Query Output:
+
+The output is displayed in a pre block for easy formatting.
+
+
+
+4. Styling:
+
+Matches your shared CSS structure, ensuring a consistent look and feel.
+
+
+
+
+
+---
+
+This implementation integrates seamlessly with your reference structure while providing the necessary functionality. Let me know if you need further customizations!
 
