@@ -283,3 +283,99 @@ This implementation integrates seamlessly with your reference structure while pr
     <button class="btn btn-primary" (click)="onRun()">Run</button>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breakdown-container">
+  <!-- RC/CRC Categories -->
+  <div class="form-group">
+    <label><b>RC/CRC Categories</b></label>
+    <div class="dropdown-container">
+      <select
+        class="form-control"
+        id="quickSearch"
+        formControlName="quickSearch"
+        [(ngModel)]="selectedSearch"
+        (change)="onQuickSearchChange()"
+      >
+        <!-- Dropdown options -->
+        <option *ngFor="let option of rcCrcOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Source Description -->
+  <div class="form-group">
+    <label><b>Source Description</b></label>
+    <input
+      type="text"
+      class="form-control"
+      id="sourceDescription"
+      formControlName="sourceDescription"
+      placeholder="Enter Source Description"
+    />
+  </div>
+
+  <!-- Date Selection -->
+  <div class="form-group">
+    <label><b>Date</b></label>
+    <input
+      type="date"
+      class="form-control"
+      id="selectDate"
+      formControlName="selectDate"
+    />
+  </div>
+
+  <!-- Run Button -->
+  <div class="form-group">
+    <button class="btn btn-primary run-button" (click)="onRun()">Run</button>
+  </div>
+</div>
+
+<!-- Query Output -->
+<div class="query-output">
+  <h5>Query Output</h5>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Basic ID</th>
+        <th>Name</th>
+        <th>Balance</th>
+        <th>Account</th>
+        <th>System Environment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of queryResults">
+        <td>{{ row.date }}</td>
+        <td>{{ row.basicId }}</td>
+        <td>{{ row.name }}</td>
+        <td>{{ row.balance }}</td>
+        <td>{{ row.account }}</td>
+        <td>{{ row.systemEnv }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
