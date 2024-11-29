@@ -169,6 +169,13 @@ Ensure the CSS matches the provided reference, emphasizing consistent styling.
   font-size: 14px;
   padding: 5px;
   font-family: 'Source Sans Pro', Arial, sans-serif;
+
+
+
+
+
+
+
   background-color: #fff;
 }
 
@@ -209,3 +216,70 @@ Matches your shared CSS structure, ensuring a consistent look and feel.
 
 This implementation integrates seamlessly with your reference structure while providing the necessary functionality. Let me know if you need further customizations!
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="form-row" style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
+  <!-- RC/CRC Categories -->
+  <div style="flex: 1;">
+    <span class="span-text"><b>Rc/Crc categories</b></span>
+  </div>
+
+  <!-- Quick Search -->
+  <div style="flex: 2;">
+    <span class="span-text">Quick Search</span>
+    <div class="input-group">
+      <select
+        class="form-control form-control-alt select-style"
+        id="quickSearch"
+        formControlName="quickSearch"
+        [(ngModel)]="selectedSearch"
+        (change)="onQuickSearchChange()"
+      >
+        <!-- Add your dropdown options here -->
+      </select>
+    </div>
+  </div>
+
+  <!-- Source Description -->
+  <div style="flex: 3;">
+    <span class="span-text">Source Description</span>
+    <input
+      type="text"
+      class="form-control"
+      id="sourceDescription"
+      formControlName="sourceDescription"
+      placeholder="Enter source description"
+    />
+  </div>
+
+  <!-- Select Date -->
+  <div style="flex: 2;">
+    <span class="span-text">Select Date</span>
+    <input
+      type="date"
+      class="form-control"
+      id="selectDate"
+      formControlName="selectDate"
+    />
+  </div>
+
+  <!-- Run Button -->
+  <div style="flex: 0;">
+    <button class="btn btn-primary" (click)="onRun()">Run</button>
+  </div>
+</div>
