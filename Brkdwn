@@ -1,0 +1,47 @@
+<div class="breakdown-container">
+  <!-- Header Section -->
+  <div class="header">
+    <button class="export-button">Export Breakdown</button>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters">
+    <div class="form-group">
+      <label for="rcCrcCategory">RC/CRC Categories</label>
+      <select id="rcCrcCategory" class="form-control">
+        <!-- Options -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="sourceDescription">Source Description</label>
+      <input type="text" id="sourceDescription" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="datePicker">Date</label>
+      <input type="date" id="datePicker" class="form-control" />
+    </div>
+    <div class="form-group">
+      <button class="run-button">Run</button>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Basic ID</th>
+          <th>Limit Code</th>
+          <th>Asset Class</th>
+          <th>Currency</th>
+          <th>Value</th>
+          <th>Date</th>
+          <th>User</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dynamic Data -->
+      </tbody>
+    </table>
+  </div>
+</div>
