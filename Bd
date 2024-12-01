@@ -1,0 +1,163 @@
+Below is the Angular implementation of the Breakdown Requirements section organized like the "Basic Limits" layout. This includes the HTML structure in the Angular component template and SCSS for styling.
+
+
+---
+
+1. Component HTML (breakdown-requirements.component.html)
+
+<div class="container">
+  <!-- Breakdown Requirements Section -->
+  <div class="section">
+    <div class="section-title">Breakdown Requirements</div>
+
+    <!-- Quick Search and Source Description Row -->
+    <div class="form-row">
+      <div>
+        <label for="quick-search">Quick Search</label>
+        <input type="text" id="quick-search" placeholder="Enter search term" />
+      </div>
+      <div>
+        <label for="source-description">Source Description</label>
+        <select id="source-description">
+          <option>Estimated Withdrawal Capability</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Select Date Row -->
+    <div class="form-row">
+      <div>
+        <label for="date">Select Date</label>
+        <input type="date" id="date" />
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button (click)="onRun()">Run</button>
+    </div>
+  </div>
+</div>
+
+
+---
+
+2. Component SCSS (breakdown-requirements.component.scss)
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+}
+
+.section {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+
+  .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    > div {
+      flex: 1;
+      margin-right: 10px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      label {
+        font-size: 14px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .actions {
+    text-align: right;
+
+    button {
+      padding: 10px 15px;
+      font-size: 14px;
+      color: white;
+      background-color: #f04c4c;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #d84343;
+      }
+    }
+  }
+}
+
+
+---
+
+3. Component TypeScript (breakdown-requirements.component.ts)
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-breakdown-requirements',
+  templateUrl: './breakdown-requirements.component.html',
+  styleUrls: ['./breakdown-requirements.component.scss']
+})
+export class BreakdownRequirementsComponent {
+  onRun(): void {
+    // Implement the Run button logic here
+    console.log('Run button clicked');
+  }
+}
+
+
+---
+
+Steps to Integrate:
+
+1. Generate Component: Run the following command to create the component:
+
+ng generate component breakdown-requirements
+
+
+2. Replace Generated Files: Replace the generated .html, .scss, and .ts files with the content above.
+
+
+3. Add to a Module: Ensure the component is declared in the corresponding Angular module.
+
+
+4. Include in App: Add the component selector (<app-breakdown-requirements></app-breakdown-requirements>) to your desired parent component or the app.component.html.
+
+
+5. Serve Application: Run the Angular application:
+
+ng serve
+
+
+
+
+---
+
+This will create a styled and functional Breakdown Requirements section in your Angular app using SCSS. Let me know if you need further customization!
+
