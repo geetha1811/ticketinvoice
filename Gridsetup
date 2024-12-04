@@ -13,3 +13,23 @@ downloadTemplate(): void {
 
   this.gridOptions.api!.exportDataAsExcel(excelParams);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+downloadTemplate(): void {
+    const fileName = 'gridData.xlsx';
+    const columnDefinitions = this.gridOptions.columnApi.getAllColumns().map(col => col.getColDef());
+    const gridData = this.gridOptions.api.getRenderedNodes().map(node => node.data);
+
+    this.gridSetupExporter.downloadToExcel(fileName, columnDefinitions, gridData);
+  }
+}
