@@ -1,0 +1,102 @@
+To ensure that columnsExcluded is managed in the GridSetupExporter instead of being directly defined in the component, you need to update the implementation as follows:
+
+
+---
+
+Updated GridSetupExporter
+
+Modify the GridSetupExporter to expose columnsExcluded and provide a method to filter columns based on it.
+
+export class GridSetupExporter {
+  private columnsExcluded: string[] = [
+    'GRID_DEFINITION_ID',
+    'GRID_COMBINATION_ID',
+    'ACTIVE',
+    'STATUS',
+    'CREATE_DATE',
+    'UPDATE_DATE',
+    'CREATE_USER',
+    'UPDATE_USER',
+  ];
+
+  getExcludedColumns(): string[] {
+    return this.columnsExcluded;
+  }
+
+  filterColumns(columnDefinitions: any[]): string[] {
+    return columnDefinitions
+      .map(column => column.field)
+      .filter(field => field && !this.columnsExcluded.includes(field));
+  }
+}
+
+
+---
+
+Updated gridSetup.component.ts
+
+Use the GridSetupExporter to retrieve the excluded columns and filter the columns dynamically during the export.
+
+import { Component } from '@angular/core';
+import { GridSetupExporter } from './grid-setup-exporter';
+
+@Component({
+  selector: 'app-grid-setup',
+  templateUrl: './grid-setup.component.html',
+})
+export class GridSetupComponent {
+  constructor(private gridSetupExporter: GridSetupExporter) {}
+
+  downloadTemplate(): void {
+    // Get all columns from the grid
+    const allColumns = this.gridOptions.columnApi!.getAllColumns();
+    const columnDefinitions = allColumns.map(column => column.getColDef());
+
+    // Use the exporter to filter the columns
+    const includedColumns = this.gridSetupExporter.filterColumns(columnDefinitions);
+
+    // Prepare the parameters for Excel export
+    const excelParams = {
+      columnKeys: includedColumns,
+      fileName: `${this.selectedGridName}.xlsx`,
+      sheetName: 'Sheet1',
+      skipHeader: false,
+    };
+
+    // Export the data to Excel
+    this.gridOptions.api!.exportDataAsExcel(excelParams);
+
+    // Log for debugging
+    console.log('Testing grid options:', this.gridOptions);
+  }
+}
+
+
+---
+
+Explanation:
+
+1. In GridSetupExporter:
+
+columnsExcluded is defined privately, and its value is encapsulated.
+
+getExcludedColumns() provides read-only access to columnsExcluded.
+
+filterColumns(columnDefinitions) filters out excluded columns based on the list.
+
+
+
+2. In GridSetupComponent:
+
+The component calls filterColumns() from GridSetupExporter to get the included columns.
+
+No direct reference to columnsExcluded in the component ensures separation of concerns.
+
+
+
+
+
+---
+
+This approach keeps columnsExcluded centralized in the GridSetupExporter and avoids duplication or direct management in the component. Let me know if you need further modifications!
+
