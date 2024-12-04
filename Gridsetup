@@ -1,0 +1,15 @@
+downloadTemplate(): void {
+  const allColumns = this.gridOptions.columnApi!.getAllColumns();
+  const includedColumns = allColumns
+    .map(col => col.getColDef().field)
+    .filter(field => field && !this.columnsExcluded.includes(field));
+
+  const excelParams = {
+    columnKeys: includedColumns,
+    fileName: 'gridData.xlsx',
+    sheetName: 'Sheet1',
+    skipHeader: false
+  };
+
+  this.gridOptions.api!.exportDataAsExcel(excelParams);
+}
