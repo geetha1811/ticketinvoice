@@ -82,6 +82,109 @@ columnsExcluded is defined privately, and its value is encapsulated.
 
 getExcludedColumns() provides read-only access to columnsExcluded.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The reason for using exportGridToExcel in my earlier explanation was to introduce a wrapper method inside the GridSetupExporter to encapsulate all the logic, such as filtering columns and exporting the grid data. However, if your intent is to keep using the existing exportDataAsExcel method from the AG-Grid API directly, we can modify the implementation accordingly.
+
+Here’s the updated explanation, where we simply use exportDataAsExcel and still achieve your requirement of keeping the logic in the GridSetupExporter:
+
+
+---
+
+Updated GridSetupExporter
+
+We still encapsulate the logic for filtering the columns in the exporter but delegate the actual Excel export to exportDataAsExcel, as provided by the AG-Grid API.
+
+export class GridSetupExporter {
+  private columnsExcluded: string[] = [
+    'GRID_DEFINITION_ID',
+    'GRID_COMBINATION_ID',
+    'ACTIVE',
+    'STATUS',
+    'CREATE_DATE',
+    'UPDATE_DATE',
+    'CREATE_USER',
+    'UPDATE_USER',
+  ];
+
+  // Method to prepare the Excel parameters and call the grid's exportDataAsExcel API
+  prepareAndExport(gridOptions: any, fileName: string): void {
+    const allColumns = gridOptions.columnApi!.getAllColumns(); // Get all columns from grid
+    const includedColumns = this.getIncludedColumns(allColumns); // Filter included columns
+
+    const excelParams = {
+      columnKeys: includedColumns,
+      fileName: `${fileName}.xlsx`,
+      sheetName: 'Sheet1',
+      skipHeader: false,
+    };
+
+    // Call the AG-Grid export method directly
+    gridOptions.api!.exportDataAsExcel(excelParams);
+  }
+
+  // Private method to filter the non-excluded columns
+  private getIncludedColumns(allColumns: any[]): string[] {
+    return allColumns
+      .map(column => column.getColDef().field)
+      .filter(field => field && !this.columnsExcluded.includes(field));
+  }
+}
+
+
+---
+
+Updated GridSetupComponent
+
+In the GridSetupComponent, we now call the prepareAndExport method in GridSetupExporter, which handles everything internally.
+
+downloadTemplate(): void {
+  this.gridSetupExporter.prepareAndExport(this.gridOptions, this.selectedGridName);
+}
+
+
+---
+
+Why Not Use exportDataAsExcel Directly in the Component?
+
+By encapsulating the column filtering logic in GridSetupExporter:
+
+The GridSetupComponent stays clean and avoids duplication of logic.
+
+Any future changes (e.g., modifying the columnsExcluded list) will only require updates in one place (GridSetupExporter).
+
+
+
+---
+
+Why a Wrapper Method (prepareAndExport)?
+
+Even though the AG-Grid API already provides exportDataAsExcel, the wrapper method:
+
+1. Handles pre-processing logic (e.g., filtering out excluded columns).
+
+
+2. Makes the GridSetupComponent independent of implementation details, promoting a cleaner separation of concerns.
+
+
+
+If you have additional concerns or customization needs, let me know!
+
+
+
 filterColumns(columnDefinitions) filters out excluded columns based on the list.
 
 
